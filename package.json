@@ -1,0 +1,30 @@
+{
+  "name": "jswidler-challenge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./app.js",
+  "engines": {
+    "node": ">=14.13.1"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "build": "node build.js",
+    "deploy": "gcloud app deploy",
+    "open": "gcloud app browse",
+    "tail": "gcloud app logs tail -s default",
+    "set-project": "gcloud config set project jswidler",
+    "predeploy": "yarn set-project && yarn build",
+    "preopen": "yarn set-project",
+    "pretail": "yarn set-project"
+  },
+  "dependencies": {
+    "crypto-random-string": "^4.0.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "mongodb": "^4.2.2"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^8.0.4"
+  }
+}
