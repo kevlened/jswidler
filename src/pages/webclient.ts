@@ -1,3 +1,6 @@
+import { html } from "hono/html"
+
+export default html`
 <html>
 <title>Coding Challenge Webclient</title>
 <body>
@@ -120,3 +123,4 @@
       return;
   }
 </script>
+`

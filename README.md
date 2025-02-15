@@ -7,4 +7,4 @@ The rules are simple, but the search for a solution is a journey.
 While the challenge is no longer hosted at jswidler.com/challenge, I've rebuilt the challenge so others may enjoy it. A faithful reproduction based on [the backups from the Internet Archive](https://web.archive.org/web/2016*/jswidler.com/challenge) is hosted at [jswidler.co/challenge](https://jswidler.co/challenge).
 
 ## to run locally
-`yarn && yarn start`
+`bun dev`

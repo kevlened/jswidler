@@ -1,3 +1,6 @@
+import { html } from "hono/html"
+
+export default html`
 <html>
 <title>Coding Challenge Instructions</title>
 <body>
@@ -58,3 +61,4 @@
 </div>
 </body>
 </html>
+`

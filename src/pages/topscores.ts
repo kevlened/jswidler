@@ -1,3 +1,6 @@
+import { html } from "hono/html"
+
+export default html`
 <html>
 
 <title>Challenge Top Scores</title>
@@ -91,3 +94,4 @@
         return '<a href="/challenge/'+id+'">'+id+'</a>';
     }
 </script>
+`
