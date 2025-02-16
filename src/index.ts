@@ -43,11 +43,10 @@ app.get('/challenge/:id', async (c) => {
   
   // Prepare the SQLite query to select the challenge record
   const sqlQuery = `
-    SELECT 
+    SELECT
       challengeId,
       score,
       gameState,
-      guessesMade,
       guessesLeft,
       level,
       secretLength
@@ -64,7 +63,15 @@ app.get('/challenge/:id', async (c) => {
     return c.json({ error: 'Challenge not found' }, 404)
   }
   
-  return c.json(challenge)
+  return c.json({
+    challengeId: challenge.challengeId,
+    score: challenge.score,
+    gameState: challenge.gameState,
+    guessesMade: 5000 - (challenge.guessesLeft as unknown as number),
+    guessesLeft: challenge.guessesLeft,
+    level: challenge.level,
+    secretLength: challenge.secretLength
+  })
 })
 
 
@@ -262,8 +269,8 @@ app.post('/challenge/guess', async (c) => {
   // Update score if improved
   if (correct > levelScore) {
     const previousLevel = level - 1;
-    const upTo5 = Math.min(previousLevel, 5) * 2;
-    const after5 = Math.max(previousLevel - 5, 0) * 4;
+    const upTo5 = Math.min(previousLevel, 4) * 2;
+    const after5 = Math.max(previousLevel - 4, 0) * 4;
     const previousLevelSum = upTo5 + after5;
     levelScore = correct;
     score = previousLevelSum + levelScore;
@@ -276,7 +283,7 @@ app.post('/challenge/guess', async (c) => {
     numberLettersCorrect = 0;
     levelScore = 0;
 
-    const inc = level <= 5 ? 2 : 4;
+    const inc = level <= 4 ? 2 : 4;
     secretLength = secretLength + inc;
     secret = createSecret(secretLength);
   }

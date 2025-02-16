@@ -5,6 +5,8 @@
     "migrate": "wrangler d1 migrations apply jswidler",
     "migrate:remote": "wrangler d1 migrations apply jswidler --remote",
     "migrate:create": "wrangler d1 migrations create jswidler",
+    "create:db": "wrangler d1 create jswidler",
+    "delete:db": "wrangler d1 delete jswidler -y",
     "dev": "bun migrate && wrangler dev",
     "release": "bun migrate:remote && wrangler deploy --minify"
   },

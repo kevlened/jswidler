@@ -25,7 +25,7 @@
     {
       "binding": "DB",
       "database_name": "jswidler",
-      "database_id": "ab2b3800-3ce9-449a-baa3-29a0969356af",
+      "database_id": "f305dd98-d8b9-4502-a905-0fff5db5adbb",
       // this can't be automated until https://github.com/cloudflare/workers-sdk/issues/4471 is fixed
       "migrations_dir": "migrations"
     }
