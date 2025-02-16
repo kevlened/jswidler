@@ -81,9 +81,12 @@ function createToken(): string {
 
 function createSecret(length: number): string {
   const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+  const values = new Uint8Array(length);
+  crypto.getRandomValues(values);
+  
   let result = '';
   for (let i = 0; i < length; i++) {
-    result += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+    result += alphabet.charAt(values[i] % alphabet.length);
   }
   return result;
 }
