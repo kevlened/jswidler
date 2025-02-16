@@ -32,7 +32,13 @@
   ],
   "assets": {
     "directory": "public"
-  }
+  },
+  "routes": [
+    {
+      "pattern": "jswidler.co",
+      "custom_domain": true
+    }
+  ]
   // "ai": {
   //   "binding": "AI"
   // },

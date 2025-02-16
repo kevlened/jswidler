@@ -96,16 +96,15 @@ async function getNextChallengeId(db: D1Database): Promise<number> {
 app.post('/challenge', async (c) => {
   // accept a form or json body
   let solverName: string | null = null;
-  try {
+
+  // get the content-type
+  const contentType = c.req.header('content-type')
+  if (contentType === 'application/json') {
+    const jsonBody = await c.req.json()
+    solverName = jsonBody.solverName || null;
+  } else {
     const formData = await c.req.formData();
     solverName = formData.get('solverName')?.toString() || null;
-  } catch {
-    try {
-      const jsonBody = await c.req.json();
-      solverName = jsonBody.solverName || null;
-    } catch {
-      // Failed to parse as either format
-    }
   }
 
   if (!solverName) {
@@ -162,19 +161,22 @@ app.post('/challenge/guess', async (c) => {
   // Try to parse as form data first, then fall back to JSON
   let token: string | null = null;
   let guess: string | null = null;
-  
-  try {
-    const formData = await c.req.formData();
-    token = formData.get('token')?.toString() || null;
-    guess = formData.get('guess')?.toString() || null;
-  } catch {
-    try {
-      const body = await c.req.json();
-      token = body.token || null;
-      guess = body.guess || null;
-    } catch {
+
+  const contentType = c.req.header('content-type');
+  if (contentType === 'application/json') {
+    const jsonBody = await c.req.json();
+    if (!jsonBody) {
       return c.json({ error: 'Missing POST body.' }, 400);
     }
+    token = jsonBody.token || null;
+    guess = jsonBody.guess || null;
+  } else {
+    const formData = await c.req.formData();
+    if (!formData) {
+      return c.json({ error: 'Missing POST body.' }, 400);
+    }
+    token = formData.get('token')?.toString() || null;
+    guess = formData.get('guess')?.toString() || null;
   }
   
   if (!token) {
@@ -317,7 +319,10 @@ app.post('/challenge/guess', async (c) => {
     numberLettersCorrect,
     level,
     secretLength,
-    guessesLeft
+    guessesLeft,
+
+    // I don't think was in the original version
+    score,
   });
 });
 
