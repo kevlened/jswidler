@@ -92,15 +92,6 @@ function createSecret(length: number): string {
 
 const isLowercase = /^[a-z]+$/;
 
-// Add this function near the other utility functions
-async function getNextChallengeId(db: D1Database): Promise<number> {
-  const result = await db.prepare(
-    'SELECT MAX(challengeId) as maxId FROM challenges'
-  ).first<{ maxId: number }>();
-  
-  return (result?.maxId || 0) + 1;
-}
-
 // Add the new route
 app.post('/challenge', async (c) => {
   // accept a form or json body
@@ -120,7 +111,6 @@ app.post('/challenge', async (c) => {
     return c.json({ error: "Need to provide a 'solverName'." }, 400);
   }
 
-  const challengeId = await getNextChallengeId(c.env.DB);
   const token = createToken();
   const startingSecretLength = 2;
   const allowedGuesses = 5000;
@@ -139,13 +129,16 @@ app.post('/challenge', async (c) => {
       level,
       levelScore,
       created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    )
+    SELECT
+      ?, COALESCE(MAX(challengeId), 0) + 1, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP
+    FROM challenges
+    RETURNING challengeId
   `;
 
-  await c.env.DB.prepare(insertQuery)
+  const inserted = await c.env.DB.prepare(insertQuery)
     .bind(
       solverName,
-      challengeId,
       token,
       'active',
       secret,
@@ -155,7 +148,9 @@ app.post('/challenge', async (c) => {
       1, // level
       0  // levelScore
     )
-    .run();
+    .first<{ challengeId: number }>();
+
+  const challengeId = inserted!.challengeId;
 
   return c.json({
     token,
