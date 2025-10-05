@@ -1,4 +1,4 @@
-import { html } from "hono/html"
+import { html } from "hono/html";
 
 export default html`
 <html>
@@ -94,4 +94,4 @@ export default html`
         return '<a href="/challenge/'+id+'">'+id+'</a>';
     }
 </script>
-`
+`;

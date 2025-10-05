@@ -1,28 +1,30 @@
 {
-  "name": "jswidler",
-  "scripts": {
-    "setup": "wrangler d1 create jswidler",
-    "migrate": "wrangler d1 migrations apply jswidler",
-    "migrate:remote": "wrangler d1 migrations apply jswidler --remote",
-    "migrate:create": "wrangler d1 migrations create jswidler",
-    "create:db": "wrangler d1 create jswidler",
-    "delete:db": "wrangler d1 delete jswidler -y",
-    "dev": "bun migrate && wrangler dev",
-    "release": "bun migrate:remote && wrangler deploy --minify",
-    "test": "bun test"
-  },
-  "dependencies": {
-    "hono": "^4.7.1"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20251004.0",
-    "wrangler": "^4.42.0",
-    "@types/bun": "latest"
-  },
-  "module": "src/index.ts",
-  "type": "module",
-  "private": true,
-  "peerDependencies": {
-    "typescript": "^5"
-  }
+	"name": "jswidler",
+	"scripts": {
+		"setup": "wrangler d1 create jswidler",
+		"migrate": "wrangler d1 migrations apply jswidler",
+		"migrate:remote": "wrangler d1 migrations apply jswidler --remote",
+		"migrate:create": "wrangler d1 migrations create jswidler",
+		"create:db": "wrangler d1 create jswidler",
+		"delete:db": "wrangler d1 delete jswidler -y",
+		"dev": "bun migrate && wrangler dev",
+		"release": "bun migrate:remote && wrangler deploy --minify",
+		"test": "bun test",
+		"lint": "bunx biome check --write ./src ./package.json"
+	},
+	"dependencies": {
+		"hono": "^4.7.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.5",
+		"@cloudflare/workers-types": "^4.20251004.0",
+		"@types/bun": "latest",
+		"wrangler": "^4.42.0"
+	},
+	"module": "src/index.ts",
+	"type": "module",
+	"private": true,
+	"peerDependencies": {
+		"typescript": "^5"
+	}
 }

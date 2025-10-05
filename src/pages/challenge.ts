@@ -1,4 +1,4 @@
-import { html } from "hono/html"
+import { html } from "hono/html";
 
 export default html`
 <html>
@@ -61,4 +61,4 @@ export default html`
 </div>
 </body>
 </html>
-`
+`;
