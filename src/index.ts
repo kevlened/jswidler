@@ -22,11 +22,10 @@ app.get('/challenge/topscorelist', async (c) => {
   const query = `
     SELECT challengeId, solverName, score, level
     FROM challenges
-    WHERE gameState = 'complete'
     ORDER BY score DESC
     LIMIT 25
   `;
-  
+
   const results = await c.env.DB.prepare(query).all();
   return c.json(results.results);
 })
@@ -213,7 +212,7 @@ app.post('/challenge/guess', async (c) => {
     }, 404);
   }
 
-  if (!challenge.guessesLeft) {
+  if ((challenge.guessesLeft as number) <= 0) {
     return c.json({
       error: 'No more guesses left, game is over.'
     }, 400);
@@ -263,6 +262,9 @@ app.post('/challenge/guess', async (c) => {
     levelScore: number;
   };
 
+  // Ensure levelScore has a valid value
+  levelScore = levelScore ?? 0;
+
   // Calculate correct letters
   let correct = 0;
   for (let i = 0; i < guess.length; i++) {
@@ -281,7 +283,7 @@ app.post('/challenge/guess', async (c) => {
 
   // Handle level advancement
   let numberLettersCorrect = correct;
-  if (correct == guess.length) {
+  if (correct === guess.length) {
     level++;
     numberLettersCorrect = 0;
     levelScore = 0;
@@ -293,7 +295,7 @@ app.post('/challenge/guess', async (c) => {
 
   // Update guesses and game state
   guessesLeft -= 1;
-  if (!guessesLeft) {
+  if (guessesLeft <= 0) {
     gameState = 'complete';
   }
 
