@@ -8,13 +8,21 @@
     "create:db": "wrangler d1 create jswidler",
     "delete:db": "wrangler d1 delete jswidler -y",
     "dev": "bun migrate && wrangler dev",
-    "release": "bun migrate:remote && wrangler deploy --minify"
+    "release": "bun migrate:remote && wrangler deploy --minify",
+    "test": "bun test"
   },
   "dependencies": {
     "hono": "^4.7.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251004.0",
-    "wrangler": "^4.42.0"
+    "wrangler": "^4.42.0",
+    "@types/bun": "latest"
+  },
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "peerDependencies": {
+    "typescript": "^5"
   }
 }

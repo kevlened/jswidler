@@ -92,6 +92,13 @@ function createSecret(length: number): string {
 
 const isLowercase = /^[a-z]+$/;
 
+export function completedLevelsScore(prevLevels: number): number {
+  const k = prevLevels; // number of fully completed levels
+  if (k <= 0) return 0;
+  if (k <= 4) return k * (k + 1);           // 2 + 4 + 6 + 8 = 20 when k=4
+  return 20 + 2 * (k - 4) * (k + 1);        // 20 + (12 + 16 + 20 + ...)
+}
+
 // Add the new route
 app.post('/challenge', async (c) => {
   // accept a form or json body
@@ -225,18 +232,6 @@ app.post('/challenge/guess', async (c) => {
     }, 400);
   }
 
-  // Only get new token after all validation passes
-  const newToken = createToken();
-  const updateTokenQuery = `
-    UPDATE challenges 
-    SET token = ?
-    WHERE token = ?
-  `;
-
-  await c.env.DB.prepare(updateTokenQuery)
-    .bind(newToken, token)
-    .run();
-
   let {
     challengeId,
     gameState,
@@ -260,20 +255,20 @@ app.post('/challenge/guess', async (c) => {
   // Ensure levelScore has a valid value
   levelScore = levelScore ?? 0;
 
-  // Calculate correct letters
+  // Calculate exact-position matches
   let correct = 0;
   for (let i = 0; i < guess.length; i++) {
     if (guess[i] === secret[i]) correct++;
   }
 
-  // Update score if improved
+  // ***** FIXED SCORE LOGIC *****
+  // Base = sum of secret lengths for fully completed levels
+  const base = completedLevelsScore(level - 1);
+
+  // Only update if this is an improvement on the current level
   if (correct > levelScore) {
-    const previousLevel = level - 1;
-    const upTo5 = Math.min(previousLevel, 4) * 2;
-    const after5 = Math.max(previousLevel - 4, 0) * 4;
-    const previousLevelSum = upTo5 + after5;
     levelScore = correct;
-    score = previousLevelSum + levelScore;
+    score = base + levelScore;       // score never decreases across level-ups now
   }
 
   // Handle level advancement
@@ -294,10 +289,12 @@ app.post('/challenge/guess', async (c) => {
     gameState = 'complete';
   }
 
-  // Update the challenge in the database
+  // Generate new token and update everything atomically
+  const newToken = createToken();
   const updateQuery = `
     UPDATE challenges
-    SET 
+    SET
+      token = ?,
       gameState = ?,
       secret = ?,
       secretLength = ?,
@@ -305,11 +302,11 @@ app.post('/challenge/guess', async (c) => {
       score = ?,
       level = ?,
       levelScore = ?
-    WHERE challengeId = ?
+    WHERE challengeId = ? AND token = ?
   `;
-
-  await c.env.DB.prepare(updateQuery)
+  const upd = await c.env.DB.prepare(updateQuery)
     .bind(
+      newToken,
       gameState,
       secret,
       secretLength,
@@ -317,9 +314,15 @@ app.post('/challenge/guess', async (c) => {
       score,
       level,
       levelScore,
-      challengeId
+      challengeId,
+      token
     )
     .run();
+
+  if (!upd.meta || (upd.meta.changes ?? 0) !== 1) {
+    // If this trips, someone else rotated/used the token again in parallel
+    return c.json({ error: 'Write conflict; please retry your last guess with the latest token.' }, 409);
+  }
 
   return c.json({
     token: newToken,
